@@ -1,21 +1,192 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MIS Daily Digest — misclaw</title>
-    <style>
-      body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-        font-family: -apple-system, system-ui, sans-serif; background: #0b0c0e;
-        color: #e8eaed; text-align: center; padding: 2rem; }
-      h1 { letter-spacing: -0.03em; } p { color: #9aa0a6; } a { color: #7c9cff; }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>MIS Daily Digest</h1>
-      <p>Daily email digest of newly published Information Systems papers — one message a morning, double opt-in, unsubscribe anytime.</p>
-      <p><a href="https://misclaw.app">← misclaw.app</a></p>
-    </main>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MIS Daily Digest — new IS papers, every morning</title>
+  <meta name="description" content="One email a day with newly published Information Systems papers. Double opt-in, unsubscribe anytime." />
+  <link rel="icon" type="image/png" href="/misclaw.png" />
+  <script>
+    // Apply a saved manual theme before first paint to avoid a flash.
+    try {
+      var t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
+  <style>
+    /* Shared misclaw design tokens — system font, blue accent, light/dark. */
+    :root{
+      --bg:#fbfbfa; --panel:#fff; --panel-soft:#fbfcfd; --chip:#eef0f3;
+      --ink:#1a1c1e; --muted:#5f6368; --line:#e6e8eb;
+      --accent:#3b5bdb; --accent-soft:#e8eefc; --green-fg:#0f9d6b;
+      --shadow:0 1px 2px rgba(20,30,60,.05); --pop-shadow:0 18px 50px rgba(20,30,60,.12);
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        --bg:#0b0c0e; --panel:#141619; --panel-soft:#17191d; --chip:#1f2329;
+        --ink:#e8eaed; --muted:#9aa0a6; --line:#24272c;
+        --accent:#7c9cff; --accent-soft:#1d2742; --green-fg:#4ade80;
+        --shadow:0 1px 2px rgba(0,0,0,.3); --pop-shadow:0 18px 50px rgba(0,0,0,.5);
+      }
+    }
+    :root[data-theme="dark"]{
+      --bg:#0b0c0e; --panel:#141619; --panel-soft:#17191d; --chip:#1f2329;
+      --ink:#e8eaed; --muted:#9aa0a6; --line:#24272c;
+      --accent:#7c9cff; --accent-soft:#1d2742; --green-fg:#4ade80;
+      --shadow:0 1px 2px rgba(0,0,0,.3); --pop-shadow:0 18px 50px rgba(0,0,0,.5);
+    }
+    .mc-logo--dark,.mc-icon-sun{display:none}
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]) .mc-logo--light,
+      :root:not([data-theme="light"]) .mc-icon-moon{display:none}
+      :root:not([data-theme="light"]) .mc-logo--dark,
+      :root:not([data-theme="light"]) .mc-icon-sun{display:block}
+    }
+    :root[data-theme="dark"] .mc-logo--light,
+    :root[data-theme="dark"] .mc-icon-moon{display:none}
+    :root[data-theme="dark"] .mc-logo--dark,
+    :root[data-theme="dark"] .mc-icon-sun{display:block}
+
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%}
+    body{font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--ink);background:var(--bg);display:flex;flex-direction:column;min-height:100vh}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      padding:11px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+    .nav-left{display:flex;align-items:center;gap:9px;min-width:0}
+    .mc-home{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink)}
+    .mc-home:hover .mc-home-name{color:var(--accent)}
+    .mc-logo{border-radius:7px;border:1px solid var(--line)}
+    .mc-home-name{font-size:13.5px;font-weight:640;letter-spacing:-.01em}
+    .mc-home-name span{color:var(--muted);font-weight:400}
+    .mc-sep{color:var(--line);font-size:15px}
+    .brand{font-size:17px;font-weight:740;letter-spacing:-.01em}
+    .nav-right{display:flex;align-items:center;gap:9px}
+    .nav-link{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:8px}
+    .nav-link:hover{background:var(--chip);color:var(--accent)}
+    .mc-theme{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
+    .mc-theme:hover{border-color:var(--accent);background:var(--chip)}
+
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:6vh 18px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--pop-shadow);
+      padding:36px 38px;max-width:520px;width:100%}
+    .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;text-transform:uppercase;
+      letter-spacing:.05em;color:var(--green-fg)}
+    .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green-fg)}
+    h1{font-size:27px;line-height:1.2;letter-spacing:-.02em;margin:14px 0 8px}
+    .lede{color:var(--muted);margin:0 0 22px}
+    form{display:flex;gap:9px;flex-wrap:wrap}
+    input[type=email]{flex:1;min-width:220px;font:inherit;border:1px solid var(--line);border-radius:10px;
+      padding:11px 13px;background:var(--panel);color:var(--ink);outline:none}
+    input[type=email]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    button.primary{font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--accent);background:var(--accent);
+      color:#fff;border-radius:10px;padding:11px 20px}
+    button.primary:disabled{opacity:.6;cursor:default}
+    .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+    .note{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6}
+    .msg{margin-top:14px;font-size:13.5px;font-weight:560;min-height:1.2em}
+    .msg.ok{color:var(--green-fg)} .msg.err{color:#c23a3a}
+    @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .msg.err{color:#f08c8c}}
+    :root[data-theme="dark"] .msg.err{color:#f08c8c}
+    .features{list-style:none;margin:24px 0 0;padding:18px 0 0;border-top:1px solid var(--line);
+      display:grid;gap:10px;font-size:13.5px;color:var(--muted)}
+    .features li{display:flex;gap:9px;align-items:flex-start}
+    .features b{color:var(--ink);font-weight:600}
+    .check{color:var(--accent);flex:none}
+    footer{padding:18px;text-align:center;color:var(--muted);font-size:12.5px}
+    footer a{color:var(--accent);text-decoration:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-left">
+      <a class="mc-home" href="https://misclaw.app" title="misclaw.app — all projects">
+        <img class="mc-logo mc-logo--light" src="/misclaw.png" alt="" width="26" height="26" />
+        <img class="mc-logo mc-logo--dark" src="/misclaw-dark.png" alt="" width="26" height="26" />
+        <span class="mc-home-name">misclaw<span>.app</span></span>
+      </a>
+      <span class="mc-sep" aria-hidden="true">/</span>
+      <div class="brand">MIS Daily Digest</div>
+    </div>
+    <div class="nav-right">
+      <a class="nav-link" href="https://mis-lit-reviewer.misclaw.app">Browse the corpus →</a>
+      <button id="theme-toggle" class="mc-theme" title="Toggle light / dark mode" aria-label="Toggle light or dark mode">
+        <svg class="mc-icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="mc-icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <span class="eyebrow"><span class="dot"></span>Updated daily</span>
+      <h1>New IS papers, in your inbox every morning.</h1>
+      <p class="lede">One email a day with the Information Systems papers our crawler found
+        across journals, conferences, and preprints — straight from OpenAlex and the AIS eLibrary.</p>
+
+      <form id="sub-form" novalidate>
+        <input id="sub-email" type="email" placeholder="you@university.edu" autocomplete="email" required />
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <button class="primary" type="submit" id="sub-btn">Subscribe</button>
+      </form>
+      <div class="msg" id="sub-msg" role="status" aria-live="polite"></div>
+
+      <ul class="features">
+        <li><span class="check" aria-hidden="true">✓</span><span><b>Double opt-in.</b> We email you a confirmation link first — no surprise mail.</span></li>
+        <li><span class="check" aria-hidden="true">✓</span><span><b>One click to unsubscribe.</b> Every email carries a one-click opt-out.</span></li>
+        <li><span class="check" aria-hidden="true">✓</span><span><b>No account, no tracking.</b> Just your email, stored only to send the digest.</span></li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    Part of <a href="https://misclaw.app">misclaw.app</a> ·
+    <a href="https://mis-lit-reviewer.misclaw.app">MIS Lit Reviewer</a> — semantic search over the IS corpus
+  </footer>
+
+  <script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const cur = document.documentElement.dataset.theme
+        || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch (e) {}
+    });
+
+    const form = document.getElementById("sub-form");
+    const email = document.getElementById("sub-email");
+    const hp = form.querySelector(".hp");
+    const btn = document.getElementById("sub-btn");
+    const msg = document.getElementById("sub-msg");
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function show(text, kind) { msg.textContent = text; msg.className = "msg" + (kind ? " " + kind : ""); }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const addr = email.value.trim();
+      if (!EMAIL_RE.test(addr)) return show("Enter a valid email address.", "err");
+      btn.disabled = true; btn.textContent = "Subscribing…"; show("");
+      try {
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email: addr, website: hp.value }),
+        });
+        const out = await res.json().catch(() => ({}));
+        if (res.status === 503) show("Subscriptions aren't open quite yet — check back soon.", "err");
+        else if (!res.ok) show(out.error || "Subscription failed — try again later.", "err");
+        else {
+          show(out.already
+            ? "You're already subscribed — see you tomorrow morning."
+            : "Almost done — open the confirmation email we just sent you.", "ok");
+          if (!out.already) email.value = "";
+        }
+      } catch { show("Network error — try again.", "err"); }
+      btn.disabled = false; btn.textContent = "Subscribe";
+    });
+  </script>
+</body>
 </html>
